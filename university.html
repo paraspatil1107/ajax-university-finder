@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>University Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: green;
+            text-align: center;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 10px;
+        }
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid green;
+            padding: 8px;
+        }
+        th {
+            background-color: #e8f5e9;
+        }
+    </style>
+</head>
+<body>
+
+<h2>University Finder by Country</h2>
+
+<form onsubmit="getUniversities(); return false;">
+    <input type="text" id="country" placeholder="Enter Country Name" required>
+    <button type="submit">Search</button>
+</form>
+
+<br>
+
+<table id="uniTable">
+    <thead>
+        <tr>
+            <th>University Name</th>
+            <th>State/Province</th>
+            <th>Website</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+function getUniversities() {
+    var country = document.getElementById("country").value.trim();
+    var url = "http://universities.hipolabs.com/search?country=" + country;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            var tableBody = document.querySelector("#uniTable tbody");
+            tableBody.innerHTML = "";
+
+            if (data.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='3'>No universities found</td></tr>";
+                return;
+            }
+
+            data.forEach(function(university) {
+                var row = "<tr>" +
+                          "<td>" + university.name + "</td>" +
+                          "<td>" + (university["state-province"] || "N/A") + "</td>" +
+                          "<td><a href='" + university.web_pages[0] + "' target='_blank'>Visit</a></td>" +
+                          "</tr>";
+                tableBody.innerHTML += row;
+            });
+        } else {
+            alert("Error fetching data!");
+        }
+    };
+
+    xhr.send();
+}
+</script>
+
+</body>
+</html>
